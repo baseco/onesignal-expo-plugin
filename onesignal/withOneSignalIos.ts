@@ -135,6 +135,10 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   withAppGroupPermissions(config, props);
   withOneSignalNSE(config, props);
   withEasManagedCredentials(config, props);
+
+  console.log("YYyeeeeeeee")
+  console.log({config})
+
   return config;
 };
 

@@ -137,7 +137,18 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   withEasManagedCredentials(config, props);
 
   console.log("YYyeeeeeeee")
-  console.log({config})
+  console.log({postPublish: config.hooks.postPublish})
+  console.log({associatedDomains: config.ios.associatedDomains})
+  console.log({infoPlist: config.ios.infoPlist})
+  console.log({blockedPermissions: config.android.blockedPermissions})
+  console.log({adaptiveIcon: config.android.adaptiveIcon})
+  console.log({adaptiveIcon: config.android.intentFilters})
+  console.log({adaptiveIcon: config.extra.eas})
+  console.log({adaptiveIcon: config.mods.ios})
+  console.log({adaptiveIcon: config.plugins})
+
+
+
 
   return config;
 };

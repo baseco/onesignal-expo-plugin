@@ -28,71 +28,6 @@ import assert from 'assert';
 import getEasManagedCredentialsConfigExtra from "../support/eas/getEasManagedCredentialsConfigExtra";
 import { ExpoConfig } from '@expo/config-types';
 
-/**
- * Add 'aps-environment' record with current environment to '<project-name>.entitlements' file
- * @see https://documentation.onesignal.com/docs/react-native-sdk-setup#step-4-install-for-ios-using-cocoapods-for-ios-apps
- */
-const withAppEnvironment: ConfigPlugin<OneSignalPluginProps> = (
-  config,
-  onesignalProps
-) => {
-  return withEntitlementsPlist(config, (newConfig) => {
-    if (onesignalProps?.mode == null) {
-      throw new Error(`
-        Missing required "mode" key in your app.json or app.config.js file for "onesignal-expo-plugin".
-        "mode" can be either "development" or "production".
-        Please see onesignal-expo-plugin's README.md for more details.`
-      )
-    }
-    newConfig.modResults["aps-environment"] = onesignalProps.mode;
-    return newConfig;
-  });
-};
-
-/**
- * Add "Background Modes -> Remote notifications" and "App Group" permissions
- * @see https://documentation.onesignal.com/docs/react-native-sdk-setup#step-4-install-for-ios-using-cocoapods-for-ios-apps
- */
-const withRemoteNotificationsPermissions: ConfigPlugin<OneSignalPluginProps> = (
-  config
-) => {
-  const BACKGROUND_MODE_KEYS = ["remote-notification"];
-  return withInfoPlist(config, (newConfig) => {
-    if (!Array.isArray(newConfig.modResults.UIBackgroundModes)) {
-      newConfig.modResults.UIBackgroundModes = [];
-    }
-    for (const key of BACKGROUND_MODE_KEYS) {
-      if (!newConfig.modResults.UIBackgroundModes.includes(key)) {
-        newConfig.modResults.UIBackgroundModes.push(key);
-      }
-    }
-
-    return newConfig;
-  });
-};
-
-/**
- * Add "App Group" permission
- * @see https://documentation.onesignal.com/docs/react-native-sdk-setup#step-4-install-for-ios-using-cocoapods-for-ios-apps (step 4.4)
- */
-const withAppGroupPermissions: ConfigPlugin<OneSignalPluginProps> = (
-  config
-) => {
-  const APP_GROUP_KEY = "com.apple.security.application-groups";
-  return withEntitlementsPlist(config, newConfig => {
-    if (!Array.isArray(newConfig.modResults[APP_GROUP_KEY])) {
-      newConfig.modResults[APP_GROUP_KEY] = [];
-    }
-    const modResultsArray = (newConfig.modResults[APP_GROUP_KEY] as Array<any>);
-    const entitlement = `group.${newConfig?.ios?.bundleIdentifier || ""}.onesignal`;
-    if (modResultsArray.indexOf(entitlement) !== -1) {
-      return newConfig;
-    }
-    modResultsArray.push(entitlement);
-
-    return newConfig;
-  });
-};
 
 const withOneSignalNSE: ConfigPlugin<OneSignalPluginProps> = (config, onesignalProps) => {
   return withXcodeProject(config, async props => {
@@ -120,17 +55,14 @@ const withOneSignalNSE: ConfigPlugin<OneSignalPluginProps> = (config, onesignalP
   });
 }
 
-const withEasManagedCredentials: ConfigPlugin<OneSignalPluginProps> = (config) => {
-  assert(config.ios?.bundleIdentifier, "Missing 'ios.bundleIdentifier' in app config.")
-  config.extra = getEasManagedCredentialsConfigExtra(config as ExpoConfig);
-  return config;
-}
-
 export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   config,
   props
 ) => {
-  withAppEnvironment(config, props);
+  withEntitlementsPlist(config, (newConfig) => {
+    newConfig.modResults["aps-environment"] = props.mode;
+  });
+
   // withRemoteNotificationsPermissions(config, props);
   // withAppGroupPermissions(config, props);
   withOneSignalNSE(config, props);
@@ -159,6 +91,12 @@ export function xcodeProjectAddNse(
   options: PluginOptions,
   sourceDir: string
 ): void {
+
+
+  console.log("OPTIONS:", options)
+  console.log("appName", appName)
+  console.log("sourceDir: ", sourceDir)
+
   const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion, iPhoneDeploymentTarget, iosNSEFilePath } = options;
 
   // not awaiting in order to not block main thread

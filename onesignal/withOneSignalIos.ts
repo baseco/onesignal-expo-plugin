@@ -57,6 +57,7 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
 ) => {
   withEntitlementsPlist(config, (newConfig) => {
     newConfig.modResults["aps-environment"] = props.mode;
+    return newConfig;
   });
 
   // withRemoteNotificationsPermissions(config, props);

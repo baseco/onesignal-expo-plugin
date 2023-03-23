@@ -130,14 +130,14 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   config,
   props
 ) => {
-  withAppEnvironment(config, props);
-  withRemoteNotificationsPermissions(config, props);
-  withAppGroupPermissions(config, props);
-  withOneSignalNSE(config, props);
-  withEasManagedCredentials(config, props);
+  // withAppEnvironment(config, props);
+  // withRemoteNotificationsPermissions(config, props);
+  // withAppGroupPermissions(config, props);
+  // withOneSignalNSE(config, props);
+  // withEasManagedCredentials(config, props);
 
-  console.log("YYyeeeeeeee")
-  console.log(JSON.stringify(config, null, 4));
+  // console.log("YYyeeeeeeee")
+  // console.log(JSON.stringify(config, null, 4));
   // console.log(config.hooks.postPublish)
   // console.log({associatedDomains: config.ios.associatedDomains})
   // console.log({infoPlist: config.ios.infoPlist})

@@ -130,7 +130,7 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   config,
   props
 ) => {
-  // withAppEnvironment(config, props);
+  withAppEnvironment(config, props);
   // withRemoteNotificationsPermissions(config, props);
   // withAppGroupPermissions(config, props);
   withOneSignalNSE(config, props);

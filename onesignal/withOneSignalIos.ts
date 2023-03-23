@@ -11,21 +11,9 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import xcode from 'xcode';
-import {
-  DEFAULT_BUNDLE_SHORT_VERSION,
-  DEFAULT_BUNDLE_VERSION,
-  IPHONEOS_DEPLOYMENT_TARGET,
-  NSE_TARGET_NAME,
-  TARGETED_DEVICE_FAMILY
-} from "../support/iosConstants";
-// import { updatePodfile } from "../support/updatePodfile";
 import NseUpdaterManager from "../support/NseUpdaterManager";
-import { OneSignalLog } from "../support/OneSignalLog";
 import { FileManager } from "../support/FileManager";
 import { OneSignalPluginProps, PluginOptions } from "../types/types";
-
-
-
 
 export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   config,
@@ -77,48 +65,45 @@ export function xcodeProjectAddNse(
 
   const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion, iPhoneDeploymentTarget, iosNSEFilePath } = options;
 
-  // not awaiting in order to not block main thread
-  // updatePodfile(iosPath).catch(err => { OneSignalLog.error(err) });
-
   const projPath = `${iosPath}/${appName}.xcodeproj/project.pbxproj`;
 
   const sourceFile = "NotificationService.m"
   const extFiles = [
     "NotificationService.h",
-    `${NSE_TARGET_NAME}.entitlements`,
-    `${NSE_TARGET_NAME}-Info.plist`
+    `OneSignalNotificationServiceExtension.entitlements`,
+    `OneSignalNotificationServiceExtension-Info.plist`
   ];
 
   const xcodeProject = xcode.project(projPath);
 
   xcodeProject.parse(async function(err: Error) {
     if (err) {
-      OneSignalLog.log(`Error parsing iOS project: ${JSON.stringify(err)}`);
+      console.log(`Error parsing iOS project: ${JSON.stringify(err)}`);
       return;
     }
 
     /* COPY OVER EXTENSION FILES */
-    fs.mkdirSync(`${iosPath}/${NSE_TARGET_NAME}`, { recursive: true });
+    fs.mkdirSync(`${iosPath}/OneSignalNotificationServiceExtension`, { recursive: true });
 
     for (let i = 0; i < extFiles.length; i++) {
       const extFile = extFiles[i];
-      const targetFile = `${iosPath}/${NSE_TARGET_NAME}/${extFile}`;
+      const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/${extFile}`;
       await FileManager.copyFile(`${sourceDir}${extFile}`, targetFile);
     }
 
     // Copy NSE source file either from configuration-provided location, falling back to the default one.
     const sourcePath = iosNSEFilePath ?? `${sourceDir}${sourceFile}`
-    const targetFile = `${iosPath}/${NSE_TARGET_NAME}/${sourceFile}`;
+    const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/${sourceFile}`;
     await FileManager.copyFile(`${sourcePath}`, targetFile);
 
     /* MODIFY COPIED EXTENSION FILES */
     const nseUpdater = new NseUpdaterManager(iosPath);
     await nseUpdater.updateNSEEntitlements(`group.${bundleIdentifier}.onesignal`)
-    await nseUpdater.updateNSEBundleVersion(bundleVersion ?? DEFAULT_BUNDLE_VERSION);
-    await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion ?? DEFAULT_BUNDLE_SHORT_VERSION);
+    await nseUpdater.updateNSEBundleVersion(bundleVersion);
+    await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion);
 
     // Create new PBXGroup for the extension
-    const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], NSE_TARGET_NAME, NSE_TARGET_NAME);
+    const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
 
     // Add the new PBXGroup to the top level group. This makes the
     // files / folder appear in the file explorer in Xcode.
@@ -137,14 +122,14 @@ export function xcodeProjectAddNse(
     projObjects['PBXTargetDependency'] = projObjects['PBXTargetDependency'] || {};
     projObjects['PBXContainerItemProxy'] = projObjects['PBXTargetDependency'] || {};
 
-    if (!!xcodeProject.pbxTargetByName(NSE_TARGET_NAME)) {
-      OneSignalLog.log(`${NSE_TARGET_NAME} already exists in project. Skipping...`);
+    if (!!xcodeProject.pbxTargetByName("OneSignalNotificationServiceExtension")) {
+      console.log(`OneSignalNotificationServiceExtension already exists in project. Skipping...`);
       return;
     }
 
     // Add the NSE target
     // This adds PBXTargetDependency and PBXContainerItemProxy for you
-    const nseTarget = xcodeProject.addTarget(NSE_TARGET_NAME, "app_extension", NSE_TARGET_NAME, `${bundleIdentifier}.${NSE_TARGET_NAME}`);
+    const nseTarget = xcodeProject.addTarget("OneSignalNotificationServiceExtension", "app_extension", "OneSignalNotificationServiceExtension", `${bundleIdentifier}.OneSignalNotificationServiceExtension`);
 
     // Add build phases to the new target
     xcodeProject.addBuildPhase(
@@ -168,13 +153,13 @@ export function xcodeProjectAddNse(
     for (const key in configurations) {
       if (
         typeof configurations[key].buildSettings !== "undefined" &&
-        configurations[key].buildSettings.PRODUCT_NAME == `"${NSE_TARGET_NAME}"`
+        configurations[key].buildSettings.PRODUCT_NAME == `"OneSignalNotificationServiceExtension"`
       ) {
         const buildSettingsObj = configurations[key].buildSettings;
         buildSettingsObj.DEVELOPMENT_TEAM = devTeam;
-        buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget ?? IPHONEOS_DEPLOYMENT_TARGET;
-        buildSettingsObj.TARGETED_DEVICE_FAMILY = TARGETED_DEVICE_FAMILY;
-        buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `${NSE_TARGET_NAME}/${NSE_TARGET_NAME}.entitlements`;
+        buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget;
+        buildSettingsObj.TARGETED_DEVICE_FAMILY = `"1,2"`;
+        buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
         buildSettingsObj.CODE_SIGN_STYLE = "Automatic";
       }
     }

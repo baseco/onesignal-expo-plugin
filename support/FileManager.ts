@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import { OneSignalLog } from './OneSignalLog';
 
 /**
  * FileManager contains static *awaitable* file-system functions
@@ -9,7 +8,7 @@ export class FileManager {
     return new Promise<string>((resolve, reject) => {
       fs.readFile(path, 'utf8', (err, data) => {
         if (err || !data) {
-          OneSignalLog.error("Couldn't read file:" + path);
+          console.error("Couldn't read file:" + path);
           reject(err);
           return;
         }
@@ -22,7 +21,7 @@ export class FileManager {
     return new Promise<void>((resolve, reject) => {
       fs.writeFile(path, contents, 'utf8', (err) => {
         if (err) {
-          OneSignalLog.error("Couldn't write file:" + path);
+          console.error("Couldn't write file:" + path);
           reject(err);
           return;
         }

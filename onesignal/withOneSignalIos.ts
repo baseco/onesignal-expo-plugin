@@ -18,38 +18,14 @@ import {
   NSE_TARGET_NAME,
   TARGETED_DEVICE_FAMILY
 } from "../support/iosConstants";
-import { updatePodfile } from "../support/updatePodfile";
+// import { updatePodfile } from "../support/updatePodfile";
 import NseUpdaterManager from "../support/NseUpdaterManager";
 import { OneSignalLog } from "../support/OneSignalLog";
 import { FileManager } from "../support/FileManager";
 import { OneSignalPluginProps, PluginOptions } from "../types/types";
 
 
-const withOneSignalNSE: ConfigPlugin<OneSignalPluginProps> = (config, onesignalProps) => {
-  return withXcodeProject(config, async props => {
-    const options: PluginOptions = {
-      iosPath: props.modRequest.platformProjectRoot,
-      bundleIdentifier: props.ios?.bundleIdentifier,
-      devTeam: onesignalProps?.devTeam,
-      bundleVersion: props.ios?.buildNumber,
-      bundleShortVersion: props?.version,
-      mode: onesignalProps?.mode,
-      iPhoneDeploymentTarget: onesignalProps?.iPhoneDeploymentTarget,
-      iosNSEFilePath: onesignalProps.iosNSEFilePath
-    };
 
-    // support for monorepos where node_modules can be above the project directory.
-    const pluginDir = require.resolve("onesignal-expo-plugin/package.json")
-
-    xcodeProjectAddNse(
-      props.modRequest.projectName || "",
-      options,
-      path.join(pluginDir, "../build/support/serviceExtensionFiles/")
-    );
-
-    return props;
-  });
-}
 
 export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   config,
@@ -60,24 +36,29 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
     return newConfig;
   });
 
-  // withRemoteNotificationsPermissions(config, props);
-  // withAppGroupPermissions(config, props);
-  withOneSignalNSE(config, props);
-  // withEasManagedCredentials(config, props);
+  withXcodeProject(config, async configProps => {
+    const options: PluginOptions = {
+      iosPath: configProps.modRequest.platformProjectRoot,
+      bundleIdentifier: configProps.ios?.bundleIdentifier,
+      devTeam: props?.devTeam,
+      bundleVersion: configProps.ios?.buildNumber,
+      bundleShortVersion: configProps?.version,
+      mode: props?.mode,
+      iPhoneDeploymentTarget: props?.iPhoneDeploymentTarget,
+      iosNSEFilePath: props.iosNSEFilePath
+    };
 
-  // console.log("YYyeeeeeeee")
-  // console.log(JSON.stringify(config, null, 4));
-  // console.log(config.hooks.postPublish)
-  // console.log({associatedDomains: config.ios.associatedDomains})
-  // console.log({infoPlist: config.ios.infoPlist})
-  // console.log({blockedPermissions: config.android.blockedPermissions})
-  // console.log({adaptiveIcon: config.android.adaptiveIcon})
-  // console.log({adaptiveIcon: config.android.intentFilters})
-  // console.log({adaptiveIcon: config.extra.eas})
-  // console.log({adaptiveIcon: config.mods.ios})
-  // console.log({adaptiveIcon: config.plugins})
+    // support for monorepos where node_modules can be above the project directory.
+    const pluginDir = require.resolve("onesignal-expo-plugin/package.json")
 
+    xcodeProjectAddNse(
+      configProps.modRequest.projectName || "",
+      options,
+      path.join(pluginDir, "../build/support/serviceExtensionFiles/")
+    );
 
+    return props;
+  });
 
 
   return config;
@@ -97,7 +78,7 @@ export function xcodeProjectAddNse(
   const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion, iPhoneDeploymentTarget, iosNSEFilePath } = options;
 
   // not awaiting in order to not block main thread
-  updatePodfile(iosPath).catch(err => { OneSignalLog.error(err) });
+  // updatePodfile(iosPath).catch(err => { OneSignalLog.error(err) });
 
   const projPath = `${iosPath}/${appName}.xcodeproj/project.pbxproj`;
 

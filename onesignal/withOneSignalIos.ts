@@ -99,8 +99,8 @@ export function xcodeProjectAddNse(
     /* MODIFY COPIED EXTENSION FILES */
     const nseUpdater = new NseUpdaterManager(iosPath);
     await nseUpdater.updateNSEEntitlements(`group.${bundleIdentifier}.onesignal`)
-    await nseUpdater.updateNSEBundleVersion(bundleVersion);
-    await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion);
+    await nseUpdater.updateNSEBundleVersion(bundleVersion ?? '1');
+    await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion ?? '1.0');
 
     // Create new PBXGroup for the extension
     const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
@@ -157,7 +157,7 @@ export function xcodeProjectAddNse(
       ) {
         const buildSettingsObj = configurations[key].buildSettings;
         buildSettingsObj.DEVELOPMENT_TEAM = devTeam;
-        buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget;
+        buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget ?? "11.0";
         buildSettingsObj.TARGETED_DEVICE_FAMILY = `"1,2"`;
         buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
         buildSettingsObj.CODE_SIGN_STYLE = "Automatic";

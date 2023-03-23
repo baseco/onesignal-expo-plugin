@@ -6,7 +6,6 @@
 import {
   ConfigPlugin,
   withEntitlementsPlist,
-  withInfoPlist,
   withXcodeProject,
 } from "@expo/config-plugins";
 import * as fs from 'fs';
@@ -24,9 +23,6 @@ import NseUpdaterManager from "../support/NseUpdaterManager";
 import { OneSignalLog } from "../support/OneSignalLog";
 import { FileManager } from "../support/FileManager";
 import { OneSignalPluginProps, PluginOptions } from "../types/types";
-import assert from 'assert';
-import getEasManagedCredentialsConfigExtra from "../support/eas/getEasManagedCredentialsConfigExtra";
-import { ExpoConfig } from '@expo/config-types';
 
 
 const withOneSignalNSE: ConfigPlugin<OneSignalPluginProps> = (config, onesignalProps) => {

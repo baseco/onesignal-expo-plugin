@@ -63,7 +63,7 @@ export function xcodeProjectAddNse(
   console.log("appName", appName)
   console.log("sourceDir: ", sourceDir)
 
-  const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion, iPhoneDeploymentTarget, iosNSEFilePath } = options;
+  const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion, iPhoneDeploymentTarget } = options;
 
   const projPath = `${iosPath}/${appName}.xcodeproj/project.pbxproj`;
 
@@ -85,15 +85,18 @@ export function xcodeProjectAddNse(
     /* COPY OVER EXTENSION FILES */
     fs.mkdirSync(`${iosPath}/OneSignalNotificationServiceExtension`, { recursive: true });
 
-    for (let i = 0; i < extFiles.length; i++) {
-      const extFile = extFiles[i];
-      const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/${extFile}`;
-      await FileManager.copyFile(`${sourceDir}${extFile}`, targetFile);
-    }
+    const targetFileHeader = `${iosPath}/OneSignalNotificationServiceExtension/NotificationService.h`;
+    await FileManager.copyFile(`${sourceDir}NotificationService.h`, targetFileHeader);
+
+    const targetFileEntitlements = `${iosPath}/OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
+    await FileManager.copyFile(`${sourceDir}OneSignalNotificationServiceExtension.entitlements`, targetFileEntitlements);
+
+    const targetFilePlist = `${iosPath}/OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension-Info.plist`;
+    await FileManager.copyFile(`${sourceDir}OneSignalNotificationServiceExtension-Info.plist`, targetFilePlist);
 
     // Copy NSE source file either from configuration-provided location, falling back to the default one.
-    const sourcePath = iosNSEFilePath ?? `${sourceDir}${sourceFile}`
-    const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/${sourceFile}`;
+    const sourcePath = `${sourceDir}NotificationService.m`
+    const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/NotificationService.m`;
     await FileManager.copyFile(`${sourcePath}`, targetFile);
 
     /* MODIFY COPIED EXTENSION FILES */

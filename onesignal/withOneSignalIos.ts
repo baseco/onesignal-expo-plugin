@@ -57,7 +57,7 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
       path.join(pluginDir, "../build/support/serviceExtensionFiles/")
     );
 
-    return props;
+    return configProps;
   });
 
 

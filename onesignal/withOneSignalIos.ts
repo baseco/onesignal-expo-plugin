@@ -153,19 +153,19 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
 
 
     // Create new PBXGroup for the extension
-    const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
+    xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
 
     // Add the new PBXGroup to the top level group. This makes the
     // files / folder appear in the file explorer in Xcode.
-    const groups = xcodeProject.hash.project.objects["PBXGroup"];
-    console.log("YEEEEEE")
-    console.log(groups)
+    // const groups = xcodeProject.hash.project.objects["PBXGroup"];
+    // console.log("YEEEEEE")
+    // console.log(groups)
 
-    Object.keys(groups).forEach(function(key) {
-      if (groups[key].name === undefined) {
-        xcodeProject.addToPbxGroup(extGroup.uuid, key);
-      }
-    });
+    // Object.keys(groups).forEach(function(key) {
+    //   if (groups[key].name === undefined) {
+    //     xcodeProject.addToPbxGroup(extGroup.uuid, key);
+    //   }
+    // });
 
     // // WORK AROUND for codeProject.addTarget BUG
     // // Xcode projects don't contain these if there is only one target
@@ -202,20 +202,20 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
 
     // Edit the Deployment info of the new Target, only IphoneOS and Targeted Device Family
     // However, can be more
-    const configurations = xcodeProject.pbxXCBuildConfigurationSection();
-    for (const key in configurations) {
-      if (
-        typeof configurations[key].buildSettings !== "undefined" &&
-        configurations[key].buildSettings.PRODUCT_NAME == `"OneSignalNotificationServiceExtension"`
-      ) {
-        const buildSettingsObj = configurations[key].buildSettings;
-        buildSettingsObj.DEVELOPMENT_TEAM = devTeam;
-        buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget ?? "11.0";
-        buildSettingsObj.TARGETED_DEVICE_FAMILY = `"1,2"`;
-        buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
-        buildSettingsObj.CODE_SIGN_STYLE = "Automatic";
-      }
-    }
+    // const configurations = xcodeProject.pbxXCBuildConfigurationSection();
+    // for (const key in configurations) {
+    //   if (
+    //     typeof configurations[key].buildSettings !== "undefined" &&
+    //     configurations[key].buildSettings.PRODUCT_NAME == `"OneSignalNotificationServiceExtension"`
+    //   ) {
+    //     const buildSettingsObj = configurations[key].buildSettings;
+    //     buildSettingsObj.DEVELOPMENT_TEAM = devTeam;
+    //     buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget ?? "11.0";
+    //     buildSettingsObj.TARGETED_DEVICE_FAMILY = `"1,2"`;
+    //     buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
+    //     buildSettingsObj.CODE_SIGN_STYLE = "Automatic";
+    //   }
+    // }
 
     // Add development teams to both your target and the original project
     xcodeProject.addTargetAttribute("DevelopmentTeam", devTeam, nseTarget);

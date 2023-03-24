@@ -90,7 +90,7 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
   console.log("appName", appName)
   console.log("sourceDir: ", sourceDir)
 
-  const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion } = options;
+  const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion, iPhoneDeploymentTarget } = options;
 
 
   const nsePath = `${iosPath}/OneSignalNotificationServiceExtension`
@@ -202,20 +202,20 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
 
     // Edit the Deployment info of the new Target, only IphoneOS and Targeted Device Family
     // However, can be more
-    // const configurations = xcodeProject.pbxXCBuildConfigurationSection();
-    // for (const key in configurations) {
-    //   if (
-    //     typeof configurations[key].buildSettings !== "undefined" &&
-    //     configurations[key].buildSettings.PRODUCT_NAME == `"OneSignalNotificationServiceExtension"`
-    //   ) {
-    //     const buildSettingsObj = configurations[key].buildSettings;
-    //     buildSettingsObj.DEVELOPMENT_TEAM = devTeam;
-    //     buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget ?? "11.0";
-    //     buildSettingsObj.TARGETED_DEVICE_FAMILY = `"1,2"`;
-    //     buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
-    //     buildSettingsObj.CODE_SIGN_STYLE = "Automatic";
-    //   }
-    // }
+    const configurations = xcodeProject.pbxXCBuildConfigurationSection();
+    for (const key in configurations) {
+      if (
+        typeof configurations[key].buildSettings !== "undefined" &&
+        configurations[key].buildSettings.PRODUCT_NAME == `"OneSignalNotificationServiceExtension"`
+      ) {
+        const buildSettingsObj = configurations[key].buildSettings;
+        buildSettingsObj.DEVELOPMENT_TEAM = devTeam;
+        buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget ?? "11.0";
+        buildSettingsObj.TARGETED_DEVICE_FAMILY = `"1,2"`;
+        buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
+        buildSettingsObj.CODE_SIGN_STYLE = "Automatic";
+      }
+    }
 
     // Add development teams to both your target and the original project
     xcodeProject.addTargetAttribute("DevelopmentTeam", devTeam, nseTarget);

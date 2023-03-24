@@ -99,36 +99,33 @@ export function xcodeProjectAddNse(
     const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/NotificationService.m`;
     await FileManager.copyFile(`${sourcePath}`, targetFile);
 
-    /* MODIFY COPIED EXTENSION FILES */
-    // const nseUpdater = new NseUpdaterManager(iosPath);
-    // await nseUpdater.updateNSEEntitlements(`group.${bundleIdentifier}.onesignal`)
-    // await nseUpdater.updateNSEBundleVersion(bundleVersion ?? '1');
-    // await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion ?? '1.0');
-
     // Create new PBXGroup for the extension
     const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
 
     // Add the new PBXGroup to the top level group. This makes the
     // files / folder appear in the file explorer in Xcode.
     const groups = xcodeProject.hash.project.objects["PBXGroup"];
+    console.log("YEEEEEE")
+    console.log(groups)
+    
     Object.keys(groups).forEach(function(key) {
       if (groups[key].name === undefined) {
         xcodeProject.addToPbxGroup(extGroup.uuid, key);
       }
     });
 
-    // WORK AROUND for codeProject.addTarget BUG
-    // Xcode projects don't contain these if there is only one target
-    // An upstream fix should be made to the code referenced in this link:
-    //   - https://github.com/apache/cordova-node-xcode/blob/8b98cabc5978359db88dc9ff2d4c015cba40f150/lib/pbxProject.js#L860
-    const projObjects = xcodeProject.hash.project.objects;
-    projObjects['PBXTargetDependency'] = projObjects['PBXTargetDependency'] || {};
-    projObjects['PBXContainerItemProxy'] = projObjects['PBXTargetDependency'] || {};
+    // // WORK AROUND for codeProject.addTarget BUG
+    // // Xcode projects don't contain these if there is only one target
+    // // An upstream fix should be made to the code referenced in this link:
+    // //   - https://github.com/apache/cordova-node-xcode/blob/8b98cabc5978359db88dc9ff2d4c015cba40f150/lib/pbxProject.js#L860
+    // const projObjects = xcodeProject.hash.project.objects;
+    // projObjects['PBXTargetDependency'] = projObjects['PBXTargetDependency'] || {};
+    // projObjects['PBXContainerItemProxy'] = projObjects['PBXTargetDependency'] || {};
 
-    if (!!xcodeProject.pbxTargetByName("OneSignalNotificationServiceExtension")) {
-      console.log(`OneSignalNotificationServiceExtension already exists in project. Skipping...`);
-      return;
-    }
+    // if (!!xcodeProject.pbxTargetByName("OneSignalNotificationServiceExtension")) {
+    //   console.log(`OneSignalNotificationServiceExtension already exists in project. Skipping...`);
+    //   return;
+    // }
 
     // Add the NSE target
     // This adds PBXTargetDependency and PBXContainerItemProxy for you

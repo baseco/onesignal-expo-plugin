@@ -145,8 +145,8 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
     await FileManager.writeFile(plistFilePath, plistFile);
 
     const plistShortFilePath = `${this.nsePath}/${plistFileName}`;
-    let plistShortFile = await FileManager.readFile(plistFilePath);
-    plistFile = plistFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, bundleShortVersion ?? '1.0');
+    let plistShortFile = await FileManager.readFile(plistShortFilePath);
+    plistShortFile = plistShortFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, bundleShortVersion ?? '1.0');
     await FileManager.writeFile(plistShortFilePath, plistShortFile);
 
 

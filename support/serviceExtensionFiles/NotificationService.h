@@ -1,5 +1,4 @@
 //  NotificationService.h
-//  OneSignalNotificationServiceExtension
 
 #import <UserNotifications/UserNotifications.h>
 

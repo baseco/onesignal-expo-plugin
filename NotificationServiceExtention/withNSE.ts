@@ -47,7 +47,7 @@ const withNSE: ConfigPlugin<NSEPluginProps> = (config, props) => {
       iPhoneDeploymentTarget: props?.iPhoneDeploymentTarget,
     };
 
-    const pluginDir = require.resolve("onesignal-expo-plugin/package.json")
+    const pluginDir = require.resolve("nse-expo-plugin/package.json")
 
     xcodeProjectAddNse(
       configProps.modRequest.projectName || "",

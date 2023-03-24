@@ -185,20 +185,20 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
     const nseTarget = xcodeProject.addTarget("OneSignalNotificationServiceExtension", "app_extension", "OneSignalNotificationServiceExtension", `${bundleIdentifier}.OneSignalNotificationServiceExtension`);
 
     // Add build phases to the new target
-    // xcodeProject.addBuildPhase(
-    //   ["NotificationService.m"],
-    //   "PBXSourcesBuildPhase",
-    //   "Sources",
-    //   nseTarget.uuid
-    // );
-    // xcodeProject.addBuildPhase([], "PBXResourcesBuildPhase", "Resources", nseTarget.uuid);
+    xcodeProject.addBuildPhase(
+      ["NotificationService.m"],
+      "PBXSourcesBuildPhase",
+      "Sources",
+      nseTarget.uuid
+    );
+    xcodeProject.addBuildPhase([], "PBXResourcesBuildPhase", "Resources", nseTarget.uuid);
 
-    // xcodeProject.addBuildPhase(
-    //   [],
-    //   "PBXFrameworksBuildPhase",
-    //   "Frameworks",
-    //   nseTarget.uuid
-    // );
+    xcodeProject.addBuildPhase(
+      [],
+      "PBXFrameworksBuildPhase",
+      "Frameworks",
+      nseTarget.uuid
+    );
 
     // Edit the Deployment info of the new Target, only IphoneOS and Targeted Device Family
     // However, can be more

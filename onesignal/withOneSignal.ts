@@ -9,7 +9,7 @@ import xcode from 'xcode';
 import { FileManager } from "../support/FileManager";
 
 
- export type OneSignalPluginProps = {
+ export type NSEPluginProps = {
   mode: Mode;
   devTeam: string;
   iPhoneDeploymentTarget: string;
@@ -30,7 +30,7 @@ export enum Mode {
   Prod = "production"
 }
 
-const withOneSignal: ConfigPlugin<OneSignalPluginProps> = (config, props) => {
+const withNSE: ConfigPlugin<NSEPluginProps> = (config, props) => {
   withEntitlementsPlist(config, (newConfig) => {
     newConfig.modResults["aps-environment"] = props.mode;
     return newConfig;
@@ -69,19 +69,19 @@ export function xcodeProjectAddNse(
   sourceDir: string
 ): void {
 
-  const entitlementsFileName =`OneSignalNotificationServiceExtension.entitlements`;
+  const entitlementsFileName =`NSENotificationServiceExtension.entitlements`;
 
   const { iosPath, devTeam, bundleIdentifier,  } = options;
 
-  const nsePath = `${iosPath}/OneSignalNotificationServiceExtension`
+  const nsePath = `${iosPath}/NSENotificationServiceExtension`
 
   const projPath = `${iosPath}/${appName}.xcodeproj/project.pbxproj`;
 
   const files = [
     "NotificationService.h",
     "NotificationService.m",
-    `OneSignalNotificationServiceExtension.entitlements`,
-    `OneSignalNotificationServiceExtension-Info.plist`
+    `NSENotificationServiceExtension.entitlements`,
+    `NSENotificationServiceExtension-Info.plist`
   ];
 
   const xcodeProject = xcode.project(projPath);
@@ -92,27 +92,27 @@ export function xcodeProjectAddNse(
       return;
     }
 
-    fs.mkdirSync(`${iosPath}/OneSignalNotificationServiceExtension`, { recursive: true });
+    fs.mkdirSync(`${iosPath}/NSENotificationServiceExtension`, { recursive: true });
 
-    const targetFileHeader = `${iosPath}/OneSignalNotificationServiceExtension/NotificationService.h`;
+    const targetFileHeader = `${iosPath}/NSENotificationServiceExtension/NotificationService.h`;
     await FileManager.copyFile(`${sourceDir}NotificationService.h`, targetFileHeader);
 
-    const targetFileEntitlements = `${iosPath}/OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
-    await FileManager.copyFile(`${sourceDir}OneSignalNotificationServiceExtension.entitlements`, targetFileEntitlements);
+    const targetFileEntitlements = `${iosPath}/NSENotificationServiceExtension/NSENotificationServiceExtension.entitlements`;
+    await FileManager.copyFile(`${sourceDir}NSENotificationServiceExtension.entitlements`, targetFileEntitlements);
 
-    const targetFilePlist = `${iosPath}/OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension-Info.plist`;
-    await FileManager.copyFile(`${sourceDir}OneSignalNotificationServiceExtension-Info.plist`, targetFilePlist);
+    const targetFilePlist = `${iosPath}/NSENotificationServiceExtension/NSENotificationServiceExtension-Info.plist`;
+    await FileManager.copyFile(`${sourceDir}NSENotificationServiceExtension-Info.plist`, targetFilePlist);
 
     const sourcePath = `${sourceDir}NotificationService.m`
-    const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/NotificationService.m`;
+    const targetFile = `${iosPath}/NSENotificationServiceExtension/NotificationService.m`;
     await FileManager.copyFile(`${sourcePath}`, targetFile);
 
     const entitlementsFilePath = `${nsePath}/${entitlementsFileName}`;
     let entitlementsFile = await FileManager.readFile(entitlementsFilePath);
-    entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, `group.${bundleIdentifier}.onesignal`);
+    entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, `group.${bundleIdentifier}.NSE`);
     await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
 
-    const extGroup = xcodeProject.addPbxGroup(files, "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
+    const extGroup = xcodeProject.addPbxGroup(files, "NSENotificationServiceExtension", "NSENotificationServiceExtension");
 
     const groups = xcodeProject.hash.project.objects["PBXGroup"];
 
@@ -122,7 +122,7 @@ export function xcodeProjectAddNse(
       }
     });
 
-    const nseTarget = xcodeProject.addTarget("OneSignalNotificationServiceExtension", "app_extension", "OneSignalNotificationServiceExtension", `${bundleIdentifier}.OneSignalNotificationServiceExtension`);
+    const nseTarget = xcodeProject.addTarget("NSENotificationServiceExtension", "app_extension", "NSENotificationServiceExtension", `${bundleIdentifier}.NSENotificationServiceExtension`);
 
     xcodeProject.addBuildPhase(
       ["NotificationService.m"],
@@ -146,4 +146,4 @@ export function xcodeProjectAddNse(
   })
 }
 
-export default withOneSignal;
+export default withNSE;

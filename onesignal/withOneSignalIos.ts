@@ -13,6 +13,7 @@ import * as path from 'path';
 import xcode from 'xcode';
 // import NseUpdaterManager from "../support/NseUpdaterManager";
 import { FileManager } from "../support/FileManager";
+import NseUpdaterManager from "../support/NseUpdaterManager";
 import { OneSignalPluginProps, PluginOptions } from "../types/types";
 
 export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
@@ -99,6 +100,12 @@ export function xcodeProjectAddNse(
     const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/NotificationService.m`;
     await FileManager.copyFile(`${sourcePath}`, targetFile);
 
+        /* MODIFY COPIED EXTENSION FILES */
+        const nseUpdater = new NseUpdaterManager(iosPath);
+        await nseUpdater.updateNSEEntitlements(`group.${bundleIdentifier}.onesignal`)
+        await nseUpdater.updateNSEBundleVersion(bundleVersion ?? '1');
+        await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion ?? '1.0');
+
     // Create new PBXGroup for the extension
     const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
 
@@ -107,7 +114,7 @@ export function xcodeProjectAddNse(
     const groups = xcodeProject.hash.project.objects["PBXGroup"];
     console.log("YEEEEEE")
     console.log(groups)
-    
+
     Object.keys(groups).forEach(function(key) {
       if (groups[key].name === undefined) {
         xcodeProject.addToPbxGroup(extGroup.uuid, key);

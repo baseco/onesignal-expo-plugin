@@ -92,7 +92,7 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
   console.log("appName", appName)
   console.log("sourceDir: ", sourceDir)
 
-  const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion, iPhoneDeploymentTarget } = options;
+  const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion } = options;
 
   const projPath = `${iosPath}/${appName}.xcodeproj/project.pbxproj`;
 

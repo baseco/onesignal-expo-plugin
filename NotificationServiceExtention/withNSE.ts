@@ -6,7 +6,6 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import xcode from 'xcode';
-// import { FileManager } from "../support/FileManager";
 
 const readFile = (path: string) => {
   return new Promise<string>((resolve, reject) => {
@@ -86,7 +85,7 @@ const withNSE: ConfigPlugin<NSEPluginProps> = (config, props) => {
     xcodeProjectAddNse(
       configProps.modRequest.projectName || "",
       options,
-      path.join(pluginDir, "../build/support/serviceExtensionFiles/")
+      path.join(pluginDir, "../build/NSEFiles/")
     );
 
     return configProps;

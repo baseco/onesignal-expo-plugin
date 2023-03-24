@@ -13,7 +13,7 @@ import * as path from 'path';
 import xcode from 'xcode';
 // import NseUpdaterManager from "../support/NseUpdaterManager";
 import { FileManager } from "../support/FileManager";
-import NseUpdaterManager from "../support/NseUpdaterManager";
+// import NseUpdaterManager from "../support/NseUpdaterManager";
 import { OneSignalPluginProps, PluginOptions } from "../types/types";
 
 export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (

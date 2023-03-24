@@ -53,11 +53,39 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   return config;
 };
 
+
+async function updateNSEEntitlements(groupIdentifier: string): Promise<void> {
+  const entitlementsFilePath = `${this.nsePath}/${entitlementsFileName}`;
+  let entitlementsFile = await FileManager.readFile(entitlementsFilePath);
+
+  entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, groupIdentifier);
+  await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
+}
+
+function updateNSEBundleVersion(version: string): Promise<void> {
+  const plistFilePath = `${this.nsePath}/${plistFileName}`;
+  let plistFile = await FileManager.readFile(plistFilePath);
+  plistFile = plistFile.replace(/{{BUNDLE_VERSION}}/gm, version);
+  await FileManager.writeFile(plistFilePath, plistFile);
+}
+
+function updateNSEBundleShortVersion(version: string): Promise<void> {
+  const plistFilePath = `${this.nsePath}/${plistFileName}`;
+  let plistFile = await FileManager.readFile(plistFilePath);
+  plistFile = plistFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, version);
+  await FileManager.writeFile(plistFilePath, plistFile);
+}
+
 export function xcodeProjectAddNse(
   appName: string,
   options: PluginOptions,
   sourceDir: string
 ): void {
+
+  // let nsePath = `${iosPath}/OneSignalNotificationServiceExtension`
+
+  const entitlementsFileName =`OneSignalNotificationServiceExtension.entitlements`;
+const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
 
 
   console.log("OPTIONS:", options)
@@ -100,14 +128,30 @@ export function xcodeProjectAddNse(
     const targetFile = `${iosPath}/OneSignalNotificationServiceExtension/NotificationService.m`;
     await FileManager.copyFile(`${sourcePath}`, targetFile);
 
-        /* MODIFY COPIED EXTENSION FILES */
-        const nseUpdater = new NseUpdaterManager(iosPath);
-        await nseUpdater.updateNSEEntitlements(`group.${bundleIdentifier}.onesignal`)
-        await nseUpdater.updateNSEBundleVersion(bundleVersion ?? '1');
-        await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion ?? '1.0');
+    /* MODIFY COPIED EXTENSION FILES */
+    // const nseUpdater = new NseUpdaterManager(iosPath);
+    // await nseUpdater.updateNSEEntitlements(`group.${bundleIdentifier}.onesignal`)
+    // await nseUpdater.updateNSEBundleVersion(bundleVersion ?? '1');
+    // await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion ?? '1.0');
+
+    const entitlementsFilePath = `${this.nsePath}/${entitlementsFileName}`;
+    let entitlementsFile = await FileManager.readFile(entitlementsFilePath);
+    entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, `group.${bundleIdentifier}.onesignal`);
+    await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
+
+    const plistFilePath = `${this.nsePath}/${plistFileName}`;
+    let plistFile = await FileManager.readFile(plistFilePath);
+    plistFile = plistFile.replace(/{{BUNDLE_VERSION}}/gm, bundleVersion ?? '1');
+    await FileManager.writeFile(plistFilePath, plistFile);
+
+    const plistShortFilePath = `${this.nsePath}/${plistFileName}`;
+    let plistShortFile = await FileManager.readFile(plistFilePath);
+    plistFile = plistFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, bundleShortVersion ?? '1.0');
+    await FileManager.writeFile(plistShortFilePath, plistShortFile);
+
 
     // Create new PBXGroup for the extension
-    const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
+    // const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
 
     // Add the new PBXGroup to the top level group. This makes the
     // files / folder appear in the file explorer in Xcode.
@@ -115,11 +159,11 @@ export function xcodeProjectAddNse(
     console.log("YEEEEEE")
     console.log(groups)
 
-    Object.keys(groups).forEach(function(key) {
-      if (groups[key].name === undefined) {
-        xcodeProject.addToPbxGroup(extGroup.uuid, key);
-      }
-    });
+    // Object.keys(groups).forEach(function(key) {
+    //   if (groups[key].name === undefined) {
+    //     xcodeProject.addToPbxGroup(extGroup.uuid, key);
+    //   }
+    // });
 
     // // WORK AROUND for codeProject.addTarget BUG
     // // Xcode projects don't contain these if there is only one target
@@ -139,37 +183,37 @@ export function xcodeProjectAddNse(
     const nseTarget = xcodeProject.addTarget("OneSignalNotificationServiceExtension", "app_extension", "OneSignalNotificationServiceExtension", `${bundleIdentifier}.OneSignalNotificationServiceExtension`);
 
     // Add build phases to the new target
-    xcodeProject.addBuildPhase(
-      ["NotificationService.m"],
-      "PBXSourcesBuildPhase",
-      "Sources",
-      nseTarget.uuid
-    );
-    xcodeProject.addBuildPhase([], "PBXResourcesBuildPhase", "Resources", nseTarget.uuid);
+    // xcodeProject.addBuildPhase(
+    //   ["NotificationService.m"],
+    //   "PBXSourcesBuildPhase",
+    //   "Sources",
+    //   nseTarget.uuid
+    // );
+    // xcodeProject.addBuildPhase([], "PBXResourcesBuildPhase", "Resources", nseTarget.uuid);
 
-    xcodeProject.addBuildPhase(
-      [],
-      "PBXFrameworksBuildPhase",
-      "Frameworks",
-      nseTarget.uuid
-    );
+    // xcodeProject.addBuildPhase(
+    //   [],
+    //   "PBXFrameworksBuildPhase",
+    //   "Frameworks",
+    //   nseTarget.uuid
+    // );
 
     // Edit the Deployment info of the new Target, only IphoneOS and Targeted Device Family
     // However, can be more
-    const configurations = xcodeProject.pbxXCBuildConfigurationSection();
-    for (const key in configurations) {
-      if (
-        typeof configurations[key].buildSettings !== "undefined" &&
-        configurations[key].buildSettings.PRODUCT_NAME == `"OneSignalNotificationServiceExtension"`
-      ) {
-        const buildSettingsObj = configurations[key].buildSettings;
-        buildSettingsObj.DEVELOPMENT_TEAM = devTeam;
-        buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget ?? "11.0";
-        buildSettingsObj.TARGETED_DEVICE_FAMILY = `"1,2"`;
-        buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
-        buildSettingsObj.CODE_SIGN_STYLE = "Automatic";
-      }
-    }
+    // const configurations = xcodeProject.pbxXCBuildConfigurationSection();
+    // for (const key in configurations) {
+    //   if (
+    //     typeof configurations[key].buildSettings !== "undefined" &&
+    //     configurations[key].buildSettings.PRODUCT_NAME == `"OneSignalNotificationServiceExtension"`
+    //   ) {
+    //     const buildSettingsObj = configurations[key].buildSettings;
+    //     buildSettingsObj.DEVELOPMENT_TEAM = devTeam;
+    //     buildSettingsObj.IPHONEOS_DEPLOYMENT_TARGET = iPhoneDeploymentTarget ?? "11.0";
+    //     buildSettingsObj.TARGETED_DEVICE_FAMILY = `"1,2"`;
+    //     buildSettingsObj.CODE_SIGN_ENTITLEMENTS = `OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`;
+    //     buildSettingsObj.CODE_SIGN_STYLE = "Automatic";
+    //   }
+    // }
 
     // Add development teams to both your target and the original project
     xcodeProject.addTargetAttribute("DevelopmentTeam", devTeam, nseTarget);

@@ -11,9 +11,7 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import xcode from 'xcode';
-// import NseUpdaterManager from "../support/NseUpdaterManager";
 import { FileManager } from "../support/FileManager";
-// import NseUpdaterManager from "../support/NseUpdaterManager";
 import { OneSignalPluginProps, PluginOptions } from "../types/types";
 
 export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
@@ -53,29 +51,6 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
   return config;
 };
 
-
-// async function updateNSEEntitlements(groupIdentifier: string): Promise<void> {
-//   const entitlementsFilePath = `${this.nsePath}/${entitlementsFileName}`;
-//   let entitlementsFile = await FileManager.readFile(entitlementsFilePath);
-
-//   entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, groupIdentifier);
-//   await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
-// }
-
-// function updateNSEBundleVersion(version: string): Promise<void> {
-//   const plistFilePath = `${this.nsePath}/${plistFileName}`;
-//   let plistFile = await FileManager.readFile(plistFilePath);
-//   plistFile = plistFile.replace(/{{BUNDLE_VERSION}}/gm, version);
-//   await FileManager.writeFile(plistFilePath, plistFile);
-// }
-
-// function updateNSEBundleShortVersion(version: string): Promise<void> {
-//   const plistFilePath = `${this.nsePath}/${plistFileName}`;
-//   let plistFile = await FileManager.readFile(plistFilePath);
-//   plistFile = plistFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, version);
-//   await FileManager.writeFile(plistFilePath, plistFile);
-// }
-
 export function xcodeProjectAddNse(
   appName: string,
   options: PluginOptions,
@@ -90,7 +65,7 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
   console.log("appName", appName)
   console.log("sourceDir: ", sourceDir)
 
-  const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion, iPhoneDeploymentTarget } = options;
+  const { iosPath, bundleIdentifier, bundleVersion, bundleShortVersion } = options;
 
 
   const nsePath = `${iosPath}/OneSignalNotificationServiceExtension`
@@ -218,8 +193,8 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
     // }
 
     // Add development teams to both your target and the original project
-    xcodeProject.addTargetAttribute("DevelopmentTeam", devTeam, nseTarget);
-    xcodeProject.addTargetAttribute("DevelopmentTeam", devTeam);
+    // xcodeProject.addTargetAttribute("DevelopmentTeam", devTeam, nseTarget);
+    // xcodeProject.addTargetAttribute("DevelopmentTeam", devTeam);
 
     fs.writeFileSync(projPath, xcodeProject.writeSync());
   })

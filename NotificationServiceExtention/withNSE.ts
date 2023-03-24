@@ -6,8 +6,42 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import xcode from 'xcode';
-import { FileManager } from "../support/FileManager";
+// import { FileManager } from "../support/FileManager";
 
+const readFile = (path: string) => {
+  return new Promise<string>((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, data) => {
+      if (err || !data) {
+        console.error("Couldn't read file:" + path);
+        reject(err);
+        return;
+      }
+      resolve(data);
+    });
+  });
+}
+
+const writeFile = (path: string, contents: string) => {
+  return new Promise<void>((resolve, reject) => {
+    fs.writeFile(path, contents, 'utf8', (err) => {
+      if (err) {
+        console.error("Couldn't write file:" + path);
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+const copyFile = async (path1: string, path2: string) => {
+  const fileContents = await readFile(path1);
+  await writeFile(path2, fileContents);
+}
+
+const dirExists = (path: string) => {
+  return fs.existsSync(path)
+}
 
  export type NSEPluginProps = {
   mode: Mode;
@@ -95,22 +129,22 @@ export function xcodeProjectAddNse(
     fs.mkdirSync(`${iosPath}/NSENotificationServiceExtension`, { recursive: true });
 
     const targetFileHeader = `${iosPath}/NSENotificationServiceExtension/NotificationService.h`;
-    await FileManager.copyFile(`${sourceDir}NotificationService.h`, targetFileHeader);
+    await copyFile(`${sourceDir}NotificationService.h`, targetFileHeader);
 
     const targetFileEntitlements = `${iosPath}/NSENotificationServiceExtension/NSENotificationServiceExtension.entitlements`;
-    await FileManager.copyFile(`${sourceDir}NSENotificationServiceExtension.entitlements`, targetFileEntitlements);
+    await copyFile(`${sourceDir}NSENotificationServiceExtension.entitlements`, targetFileEntitlements);
 
     const targetFilePlist = `${iosPath}/NSENotificationServiceExtension/NSENotificationServiceExtension-Info.plist`;
-    await FileManager.copyFile(`${sourceDir}NSENotificationServiceExtension-Info.plist`, targetFilePlist);
+    await copyFile(`${sourceDir}NSENotificationServiceExtension-Info.plist`, targetFilePlist);
 
     const sourcePath = `${sourceDir}NotificationService.m`
     const targetFile = `${iosPath}/NSENotificationServiceExtension/NotificationService.m`;
-    await FileManager.copyFile(`${sourcePath}`, targetFile);
+    await copyFile(`${sourcePath}`, targetFile);
 
     const entitlementsFilePath = `${nsePath}/${entitlementsFileName}`;
-    let entitlementsFile = await FileManager.readFile(entitlementsFilePath);
+    let entitlementsFile = await readFile(entitlementsFilePath);
     entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, `group.${bundleIdentifier}.NSE`);
-    await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
+    await writeFile(entitlementsFilePath, entitlementsFile);
 
     const extGroup = xcodeProject.addPbxGroup(files, "NSENotificationServiceExtension", "NSENotificationServiceExtension");
 

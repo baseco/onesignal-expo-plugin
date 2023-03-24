@@ -23,7 +23,6 @@ export type PluginOptions = {
   bundleShortVersion?:      string,
   bundleIdentifier?:        string,
   iPhoneDeploymentTarget?:  string,
-  iosNSEFilePath?:          string
 }
 
 export enum Mode {
@@ -46,7 +45,6 @@ const withOneSignal: ConfigPlugin<OneSignalPluginProps> = (config, props) => {
       bundleShortVersion: configProps?.version,
       mode: props?.mode,
       iPhoneDeploymentTarget: props?.iPhoneDeploymentTarget,
-      iosNSEFilePath: props.iosNSEFilePath
     };
 
     const pluginDir = require.resolve("onesignal-expo-plugin/package.json")

@@ -96,12 +96,12 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
 
   const projPath = `${iosPath}/${appName}.xcodeproj/project.pbxproj`;
 
-  const sourceFile = "NotificationService.m"
-  const extFiles = [
-    "NotificationService.h",
-    `OneSignalNotificationServiceExtension.entitlements`,
-    `OneSignalNotificationServiceExtension-Info.plist`
-  ];
+  // const sourceFile = "NotificationService.m"
+  // const extFiles = [
+  //   "NotificationService.h",
+  //   `OneSignalNotificationServiceExtension.entitlements`,
+  //   `OneSignalNotificationServiceExtension-Info.plist`
+  // ];
 
   const xcodeProject = xcode.project(projPath);
 

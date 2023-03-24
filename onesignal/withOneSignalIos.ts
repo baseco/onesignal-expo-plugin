@@ -54,27 +54,27 @@ export const withOneSignalIos: ConfigPlugin<OneSignalPluginProps> = (
 };
 
 
-async function updateNSEEntitlements(groupIdentifier: string): Promise<void> {
-  const entitlementsFilePath = `${this.nsePath}/${entitlementsFileName}`;
-  let entitlementsFile = await FileManager.readFile(entitlementsFilePath);
+// async function updateNSEEntitlements(groupIdentifier: string): Promise<void> {
+//   const entitlementsFilePath = `${this.nsePath}/${entitlementsFileName}`;
+//   let entitlementsFile = await FileManager.readFile(entitlementsFilePath);
 
-  entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, groupIdentifier);
-  await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
-}
+//   entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, groupIdentifier);
+//   await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
+// }
 
-function updateNSEBundleVersion(version: string): Promise<void> {
-  const plistFilePath = `${this.nsePath}/${plistFileName}`;
-  let plistFile = await FileManager.readFile(plistFilePath);
-  plistFile = plistFile.replace(/{{BUNDLE_VERSION}}/gm, version);
-  await FileManager.writeFile(plistFilePath, plistFile);
-}
+// function updateNSEBundleVersion(version: string): Promise<void> {
+//   const plistFilePath = `${this.nsePath}/${plistFileName}`;
+//   let plistFile = await FileManager.readFile(plistFilePath);
+//   plistFile = plistFile.replace(/{{BUNDLE_VERSION}}/gm, version);
+//   await FileManager.writeFile(plistFilePath, plistFile);
+// }
 
-function updateNSEBundleShortVersion(version: string): Promise<void> {
-  const plistFilePath = `${this.nsePath}/${plistFileName}`;
-  let plistFile = await FileManager.readFile(plistFilePath);
-  plistFile = plistFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, version);
-  await FileManager.writeFile(plistFilePath, plistFile);
-}
+// function updateNSEBundleShortVersion(version: string): Promise<void> {
+//   const plistFilePath = `${this.nsePath}/${plistFileName}`;
+//   let plistFile = await FileManager.readFile(plistFilePath);
+//   plistFile = plistFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, version);
+//   await FileManager.writeFile(plistFilePath, plistFile);
+// }
 
 export function xcodeProjectAddNse(
   appName: string,

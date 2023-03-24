@@ -1,1 +1,1 @@
-module.exports = require('./build/onesignal/withNSE.js');
+module.exports = require('./build/NotificationServiceExtention/withNSE.js');

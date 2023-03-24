@@ -7,8 +7,29 @@ import * as fs from 'fs';
 import * as path from 'path';
 import xcode from 'xcode';
 import { FileManager } from "../support/FileManager";
-import { OneSignalPluginProps, PluginOptions } from "../types/types";
 
+
+ export type OneSignalPluginProps = {
+  mode: Mode;
+  devTeam: string;
+  iPhoneDeploymentTarget: string;
+};
+
+export type PluginOptions = {
+  iosPath:                  string,
+  mode:                     Mode,
+  devTeam?:                 string,
+  bundleVersion?:           string,
+  bundleShortVersion?:      string,
+  bundleIdentifier?:        string,
+  iPhoneDeploymentTarget?:  string,
+  iosNSEFilePath?:          string
+}
+
+export enum Mode {
+  Dev = "development",
+  Prod = "production"
+}
 
 const withOneSignal: ConfigPlugin<OneSignalPluginProps> = (config, props) => {
   withEntitlementsPlist(config, (newConfig) => {
@@ -51,24 +72,16 @@ export function xcodeProjectAddNse(
 ): void {
 
   const entitlementsFileName =`OneSignalNotificationServiceExtension.entitlements`;
-const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
 
-
-  console.log("OPTIONS:", options)
-  console.log("appName", appName)
-  console.log("sourceDir: ", sourceDir)
-
-  const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion } = options;
-
+  const { iosPath, devTeam, bundleIdentifier,  } = options;
 
   const nsePath = `${iosPath}/OneSignalNotificationServiceExtension`
 
-
   const projPath = `${iosPath}/${appName}.xcodeproj/project.pbxproj`;
 
-  const sourceFile = "NotificationService.m"
-  const extFiles = [
+  const files = [
     "NotificationService.h",
+    "NotificationService.m",
     `OneSignalNotificationServiceExtension.entitlements`,
     `OneSignalNotificationServiceExtension-Info.plist`
   ];
@@ -101,17 +114,7 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
     entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, `group.${bundleIdentifier}.onesignal`);
     await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
 
-    const plistFilePath = `${nsePath}/${plistFileName}`;
-    let plistFile = await FileManager.readFile(plistFilePath);
-    plistFile = plistFile.replace(/{{BUNDLE_VERSION}}/gm, bundleVersion ?? '1');
-    await FileManager.writeFile(plistFilePath, plistFile);
-
-    const plistShortFilePath = `${nsePath}/${plistFileName}`;
-    let plistShortFile = await FileManager.readFile(plistShortFilePath);
-    plistShortFile = plistShortFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, bundleShortVersion ?? '1.0');
-    await FileManager.writeFile(plistShortFilePath, plistShortFile);
-
-    const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
+    const extGroup = xcodeProject.addPbxGroup(files, "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
 
     const groups = xcodeProject.hash.project.objects["PBXGroup"];
 

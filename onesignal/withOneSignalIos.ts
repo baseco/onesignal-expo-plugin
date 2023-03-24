@@ -82,8 +82,6 @@ export function xcodeProjectAddNse(
   sourceDir: string
 ): void {
 
-  // let nsePath = `${iosPath}/OneSignalNotificationServiceExtension`
-
   const entitlementsFileName =`OneSignalNotificationServiceExtension.entitlements`;
 const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
 
@@ -93,6 +91,10 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
   console.log("sourceDir: ", sourceDir)
 
   const { iosPath, devTeam, bundleIdentifier, bundleVersion, bundleShortVersion } = options;
+
+
+  const nsePath = `${iosPath}/OneSignalNotificationServiceExtension`
+
 
   const projPath = `${iosPath}/${appName}.xcodeproj/project.pbxproj`;
 
@@ -134,17 +136,17 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
     // await nseUpdater.updateNSEBundleVersion(bundleVersion ?? '1');
     // await nseUpdater.updateNSEBundleShortVersion(bundleShortVersion ?? '1.0');
 
-    const entitlementsFilePath = `${this.nsePath}/${entitlementsFileName}`;
+    const entitlementsFilePath = `${nsePath}/${entitlementsFileName}`;
     let entitlementsFile = await FileManager.readFile(entitlementsFilePath);
     entitlementsFile = entitlementsFile.replace(/{{GROUP_IDENTIFIER}}/gm, `group.${bundleIdentifier}.onesignal`);
     await FileManager.writeFile(entitlementsFilePath, entitlementsFile);
 
-    const plistFilePath = `${this.nsePath}/${plistFileName}`;
+    const plistFilePath = `${nsePath}/${plistFileName}`;
     let plistFile = await FileManager.readFile(plistFilePath);
     plistFile = plistFile.replace(/{{BUNDLE_VERSION}}/gm, bundleVersion ?? '1');
     await FileManager.writeFile(plistFilePath, plistFile);
 
-    const plistShortFilePath = `${this.nsePath}/${plistFileName}`;
+    const plistShortFilePath = `${nsePath}/${plistFileName}`;
     let plistShortFile = await FileManager.readFile(plistShortFilePath);
     plistShortFile = plistShortFile.replace(/{{BUNDLE_SHORT_VERSION}}/gm, bundleShortVersion ?? '1.0');
     await FileManager.writeFile(plistShortFilePath, plistShortFile);

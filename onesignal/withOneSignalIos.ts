@@ -153,7 +153,7 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
 
 
     // Create new PBXGroup for the extension
-    // const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
+    const extGroup = xcodeProject.addPbxGroup([...extFiles, sourceFile], "OneSignalNotificationServiceExtension", "OneSignalNotificationServiceExtension");
 
     // Add the new PBXGroup to the top level group. This makes the
     // files / folder appear in the file explorer in Xcode.
@@ -161,11 +161,11 @@ const plistFileName = `OneSignalNotificationServiceExtension-Info.plist`;
     console.log("YEEEEEE")
     console.log(groups)
 
-    // Object.keys(groups).forEach(function(key) {
-    //   if (groups[key].name === undefined) {
-    //     xcodeProject.addToPbxGroup(extGroup.uuid, key);
-    //   }
-    // });
+    Object.keys(groups).forEach(function(key) {
+      if (groups[key].name === undefined) {
+        xcodeProject.addToPbxGroup(extGroup.uuid, key);
+      }
+    });
 
     // // WORK AROUND for codeProject.addTarget BUG
     // // Xcode projects don't contain these if there is only one target
